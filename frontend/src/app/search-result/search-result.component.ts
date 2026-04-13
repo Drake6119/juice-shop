@@ -108,8 +108,10 @@ export class SearchResultComponent implements OnDestroy, AfterViewInit {
         for (let i = 1; i <= Math.ceil(this.dataSource.data.length / 12); i++) {
           this.pageSizeOptions.push(i * 12)
         }
-        this.paginator.pageSizeOptions = this.pageSizeOptions
-        this.dataSource.paginator = this.paginator
+        if (this.paginator) {
+          this.paginator.pageSizeOptions = this.pageSizeOptions
+          this.dataSource.paginator = this.paginator
+        }
         this.gridDataSource = this.dataSource.connect()
         this.resultsLength = this.dataSource.data.length
         this.filterTable()
@@ -167,7 +169,7 @@ export class SearchResultComponent implements OnDestroy, AfterViewInit {
         this.io.socket().emit('verifyLocalXssChallenge', queryParam)
       }) // vuln-code-snippet hide-end
       this.dataSource.filter = queryParam.toLowerCase()
-      this.searchValue = this.sanitizer.bypassSecurityTrustHtml(queryParam) // vuln-code-snippet vuln-line localXssChallenge xssBonusChallenge
+      this.searchValue = String(this.searchValue) // vuln-code-snippet vuln-line localXssChallenge xssBonusChallenge
       this.gridDataSource.subscribe((result: any) => {
         if (result.length === 0) {
           this.emptyState = true
